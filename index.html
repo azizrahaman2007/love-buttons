@@ -1,0 +1,314 @@
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pick a button</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      position: relative;
+      isolation: isolate;
+      color: #20243a;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(ellipse at 12% 18%, rgb(255 255 255 / 75%) 0 2px, transparent 3px),
+        radial-gradient(ellipse at 82% 72%, rgb(255 255 255 / 60%) 0 3px, transparent 4px),
+        radial-gradient(ellipse at 75% 16%, rgb(255 208 220 / 70%) 0 2px, transparent 3px),
+        linear-gradient(135deg, #ffe1ec, #ffd1dc 48%, #f8cce8);
+      background-size: 90px 90px, 120px 120px, 70px 70px, auto;
+    }
+
+    .decorations {
+      position: fixed;
+      z-index: -1;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .decorations span {
+      position: absolute;
+      font-size: clamp(1.5rem, 4vw, 3rem);
+      opacity: 0.62;
+      filter: drop-shadow(0 3px 5px rgb(150 50 80 / 12%));
+    }
+
+    main {
+      position: relative;
+      width: min(100%, 520px);
+      padding: 48px 32px;
+      text-align: center;
+      background: #fff;
+      border: 1px solid #eeebf5;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgb(52 43 90 / 12%);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 7vw, 3rem);
+      letter-spacing: -0.05em;
+    }
+
+    p {
+      margin: 0;
+      color: #6b6d80;
+      font-size: 1.05rem;
+    }
+
+    .choices {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 32px;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    button {
+      min-width: 150px;
+      padding: 14px 20px;
+      border: 0;
+      border-radius: 12px;
+      color: #fff;
+      font: inherit;
+      font-weight: 650;
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgb(41 37 74 / 18%);
+    }
+
+    button:focus-visible {
+      outline: 3px solid #20243a;
+      outline-offset: 3px;
+    }
+
+    .click {
+      background: #7357e8;
+    }
+
+    .dont-click {
+      background: #ed6b83;
+    }
+
+    .return {
+      margin: 8px;
+      background: #8d7a94;
+    }
+
+    .reaction {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin: 28px 0;
+    }
+
+    .reaction p {
+      max-width: 290px;
+      text-align: left;
+    }
+
+    .reaction-emoji {
+      font-size: clamp(4rem, 16vw, 7rem);
+      line-height: 1;
+    }
+
+    .formed-heart {
+      display: block;
+      margin: 24px auto 36px;
+      font-size: clamp(10rem, 35vw, 18rem);
+      line-height: 1;
+      opacity: 0;
+      transform: scale(0);
+    }
+
+    .formed-heart.animate-heart {
+      animation:
+        heart-form 8s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+        heart-glow 3s ease-in-out 8s infinite alternate;
+    }
+
+    @keyframes heart-form {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes heart-glow {
+      from {
+        filter: drop-shadow(0 0 8px rgb(255 45 95 / 45%));
+      }
+
+      to {
+        filter:
+          drop-shadow(0 0 22px rgb(255 45 95 / 85%))
+          drop-shadow(0 0 48px rgb(255 105 145 / 65%));
+      }
+    }
+
+    @media (max-width: 420px) {
+      main {
+        padding: 38px 22px;
+      }
+
+      .reaction {
+        flex-direction: column-reverse;
+        gap: 12px;
+      }
+
+      .reaction p {
+        text-align: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .formed-heart.animate-heart {
+        animation: none;
+        opacity: 1;
+        transform: scale(1);
+        filter: drop-shadow(0 0 22px rgb(255 45 95 / 85%));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="decorations" aria-hidden="true"></div>
+
+  <main>
+    <section id="home">
+      <h1>Pick a button</h1>
+      <p>There are two options. Choose wisely.</p>
+      <div class="choices">
+        <button class="click" id="open-options" type="button">Click me</button>
+        <button class="dont-click" id="dont-click" type="button">dont click me</button>
+      </div>
+    </section>
+
+    <section id="click-options" hidden>
+      <h1>Choose an option</h1>
+      <div class="choices">
+        <button class="click" id="click-again" type="button">click me again</button>
+        <button class="return" id="leave-option" type="button">you can always return back</button>
+      </div>
+    </section>
+
+    <section id="love-screen" hidden>
+      <div class="reaction">
+        <p>I LOVEE YOUU SOOO MUCHHH</p>
+        <span class="reaction-emoji" role="img" aria-label="heart">❤️</span>
+      </div>
+      <button class="click" id="one-last-time" type="button">one last time</button>
+      <button class="return" type="button" data-home>Back</button>
+    </section>
+
+    <section id="heart-screen" hidden>
+      <span class="formed-heart" id="formed-heart" role="img" aria-label="forming heart">❤️</span>
+      <button class="return" type="button" data-home>Back</button>
+    </section>
+
+    <section id="broken-heart-screen" hidden>
+      <div class="reaction">
+        <p>oh so you wanna leave me</p>
+        <span class="reaction-emoji" role="img" aria-label="broken heart">💔</span>
+      </div>
+      <button class="return" type="button" data-home>Back</button>
+    </section>
+
+    <section id="dont-click-screen" hidden>
+      <div class="reaction">
+        <p>I said dont click me but you never listen to me.</p>
+        <span class="reaction-emoji" role="img" aria-label="sad face">😢</span>
+      </div>
+      <button class="return" type="button" data-home>Back</button>
+    </section>
+  </main>
+
+  <script>
+    const decorations = document.querySelector(".decorations");
+    const home = document.querySelector("#home");
+    const clickOptions = document.querySelector("#click-options");
+    const loveScreen = document.querySelector("#love-screen");
+    const heartScreen = document.querySelector("#heart-screen");
+    const brokenHeartScreen = document.querySelector("#broken-heart-screen");
+    const dontClickScreen = document.querySelector("#dont-click-screen");
+    const formedHeart = document.querySelector("#formed-heart");
+
+    const symbols = Array.from({ length: 60 }, (_, index) =>
+      index % 2 === 0 ? "❤️" : "🌹"
+    );
+
+    symbols.forEach((symbol, index) => {
+      const decoration = document.createElement("span");
+      const column = index % 10;
+      const row = Math.floor(index / 10);
+
+      decoration.textContent = symbol;
+      decoration.style.left = `${column * 10 + 2 + (row % 2) * 3}%`;
+      decoration.style.top = `${row * 16 + 4 + (column % 3) * 2}%`;
+      decorations.append(decoration);
+    });
+
+    function showScreen(screen) {
+      home.hidden = screen !== home;
+      clickOptions.hidden = screen !== clickOptions;
+      loveScreen.hidden = screen !== loveScreen;
+      heartScreen.hidden = screen !== heartScreen;
+      brokenHeartScreen.hidden = screen !== brokenHeartScreen;
+      dontClickScreen.hidden = screen !== dontClickScreen;
+    }
+
+    document.querySelector("#open-options").addEventListener("click", () => {
+      showScreen(clickOptions);
+    });
+
+    document.querySelector("#click-again").addEventListener("click", () => {
+      showScreen(loveScreen);
+    });
+
+    document.querySelector("#one-last-time").addEventListener("click", () => {
+      formedHeart.classList.remove("animate-heart");
+      showScreen(heartScreen);
+      void formedHeart.offsetWidth;
+      formedHeart.classList.add("animate-heart");
+    });
+
+    document.querySelector("#leave-option").addEventListener("click", () => {
+      showScreen(brokenHeartScreen);
+    });
+
+    document.querySelector("#dont-click").addEventListener("click", () => {
+      showScreen(dontClickScreen);
+    });
+
+    document.querySelectorAll("[data-home]").forEach((button) => {
+      button.addEventListener("click", () => showScreen(home));
+    });
+  </script>
+</body>
+</html>
